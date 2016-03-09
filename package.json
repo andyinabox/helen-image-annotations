@@ -1,0 +1,34 @@
+{
+  "name": "helen-image-annotations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "budo index.js --open --live --css styles.css"
+  },
+  "author": {
+    "name": "Andy Dayton",
+    "email": "amdayton@gmail.com",
+    "url": "http://andydayton.com/"
+  },
+  "dependencies": {
+    "a-big-triangle": "~1.0.2",
+    "exdat": "^0.6.2",
+    "gl-now": "~1.4.0",
+    "gl-shader": "~4.1.1",
+    "p5": "^0.4.23"
+  },
+  "devDependencies": {
+    "glslify": "~5.0.0",
+    "budo": "~7.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/andyinabox/helen-image-annotations.git"
+  },
+  "homepage": "https://github.com/andyinabox/helen-image-annotations",
+  "bugs": {
+    "url": "https://github.com/andyinabox/helen-image-annotations/issues"
+  }
+}
