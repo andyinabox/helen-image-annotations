@@ -14,14 +14,14 @@ var sketch = function(p) {
 
 	p.setup = function() {
 		var size = 600; //p.min(p.width, p.height);
-		canvas = p.createCanvas(size, size);
+		canvas = p.createCanvas(p.windowWidth, p.windowHeight);
 	}
 
 	p.draw = function() {
 		var imgWidth
 			, imgHeight;
 
-		p.background('#ddd');
+		p.background(0);
 
 		if(img) {
 
@@ -46,21 +46,26 @@ var sketch = function(p) {
 				p.ellipse(x, y, 2, 2);
 			});
 		}
+	}
 
-		p.mouseClicked = function() {
-			if(p.mouseX > p.width/2) {
-				dataIndex = dataIndex+1;
-				console.log('load data index '+dataIndex);
+	p.mouseClicked = function() {
+		if(p.mouseX > p.width/2) {
+			dataIndex = dataIndex+1;
+			console.log('load data index '+dataIndex);
+			loadData(dataIndex);
+		} else {
+			if(dataIndex-1 > 0) {
+				dataIndex = dataIndex-1;
 				loadData(dataIndex);
-			} else {
-				if(dataIndex-1 > 0) {
-					dataIndex = dataIndex-1;
-					loadData(dataIndex);
-				}
 			}
 		}
-
 	}
+
+	p.windowResized = function() {
+		p.resizeCanvas(p.windowWidth, p.windowHeight);
+	}
+
+
 
 	function loadData(i) {
 		var url = 'assets/annotations/'+i+".txt";
