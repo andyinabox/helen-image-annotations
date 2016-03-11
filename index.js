@@ -6,6 +6,7 @@ var imageName = "";
 var annotations;
 var img;
 var canvas;
+var _data;
 
 var gui;
 var params = {
@@ -18,7 +19,7 @@ var params = {
 
 var sketch = function(p) {
 	p.preload = function() {
-		loadData();
+		_data = p.loadJSON('assets/annotations.json', function() { loadData(); });
 	}
 
 	p.setup = function() {
@@ -80,6 +81,8 @@ var sketch = function(p) {
 				params.dataIndex = params.dataIndex-1;
 				loadData();
 			}
+		} else if (p.key === 's') {
+			p.saveCanvas(canvas, 'HELEN_'+params.dataIndex+'.jpg');
 		}
 	}
 
@@ -88,33 +91,36 @@ var sketch = function(p) {
 	}
 
 
-
 	function loadData(i) {
 		var index = i || params.dataIndex;
-		var url = 'assets/annotations/'+index+".txt";
-		console.log('load data', url);
-		p.loadStrings(url, parseData);		
+		var item = _data[index-1];
+		imageName = item[0];
+		annotations = item[1].map(function(d) { return {x:d[0], y:d[1]} });
+		img = p.loadImage('assets/images/'+imageName+'.jpg');
 	}
 
-	function parseData(data) {
-		console.log('data', data);
-		imageName = data.shift();
+	// function loadData(i) {
+	// 	var index = i || params.dataIndex;
+	// 	var url = 'assets/annotations/'+index+".txt";
+	// 	console.log('load data', url);
+	// 	p.loadStrings(url, parseData);		
+	// }
+
+	// function parseData(data) {
+	// 	console.log('data', data);
 		
-		annotations = data.map(function(d) {
-			var parts = d.split(',');
+	// 	annotations = data.map(function(d) {
+	// 		var parts = d.split(',');
 
-			return {
-				x: p.float(parts[0])
-				, y: p.float(parts[1])
-			};
-		});
+	// 		return {
+	// 			x: p.float(parts[0])
+	// 			, y: p.float(parts[1])
+	// 		};
+	// 	});
 
-		img = p.loadImage("assets/images/"+imageName+".jpg");
-	}
+	// 	img = p.loadImage("assets/images/"+imageName+".jpg");
+	// }
 
 }
-
-
-
 
 new p5(sketch);

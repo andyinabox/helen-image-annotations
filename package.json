@@ -5,7 +5,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "budo index.js --open --live --css styles.css"
+    "start": "budo index.js --open --live --css styles.css",
+    "parse": "node scripts/parse.js"
   },
   "author": {
     "name": "Andy Dayton",
