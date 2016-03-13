@@ -8,6 +8,7 @@ var img;
 var canvas;
 var _data;
 
+
 var gui;
 var params = {
 	showImage: true
@@ -15,6 +16,7 @@ var params = {
 	, annotationSize: 3
 	, dotColor: [255, 255, 255]
 	, dataIndex: 1
+	, isAnimating: false
 }
 
 var sketch = function(p) {
@@ -61,6 +63,7 @@ var sketch = function(p) {
 			}
 
 			if(params.showAnnotations) {
+
 				annotations.forEach(function(coords) {
 					var x = p.map(coords.x, 0, img.width, 0, imgWidth);
 					var y = p.map(coords.y, 0, img.height, 0, imgHeight);
@@ -70,6 +73,13 @@ var sketch = function(p) {
 				});
 			}
 		}
+
+		if(params.isAnimating) {
+			params.dataIndex = params.dataIndex+1
+			loadData();
+			console.log('animating!', params.dataIndex);
+		}
+
 	}
 
 	p.keyTyped = function() {
@@ -83,11 +93,18 @@ var sketch = function(p) {
 			}
 		} else if (p.key === 's') {
 			p.saveCanvas(canvas, 'HELEN_'+params.dataIndex+'.jpg');
+		} else if (p.key === ' ') {
+			toggleAnimation();
 		}
 	}
 
 	p.windowResized = function() {
 		p.resizeCanvas(p.windowWidth, p.windowHeight);
+	}
+
+
+	function toggleAnimation() {
+		params.isAnimating = !params.isAnimating;
 	}
 
 
