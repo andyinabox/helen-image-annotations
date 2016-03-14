@@ -3,6 +3,7 @@ var dat = require('exdat');
 
 // var dataIndex = 1;
 var imageName = "";
+var imageSize = [];
 var annotations;
 var img;
 var canvas;
@@ -50,10 +51,10 @@ var sketch = function(p) {
 			// rescale to fit canvas
 			if(img.width > img.height) {
 				imgWidth = p.width;
-				imgHeight = img.height*(p.width/img.width);
+				imgHeight = imageSize[0]*(p.width/img.width);
 			} else {
 				imgHeight = p.height;
-				imgWidth = img.width*(p.height/img.height);
+				imgWidth = imageSize[1]*(p.height/img.height);
 			}
 
 			p.translate((p.width-imgWidth)/2, (p.height-imgHeight)/2);
@@ -65,8 +66,8 @@ var sketch = function(p) {
 			if(params.showAnnotations) {
 
 				annotations.forEach(function(coords) {
-					var x = p.map(coords.x, 0, img.width, 0, imgWidth);
-					var y = p.map(coords.y, 0, img.height, 0, imgHeight);
+					var x = p.map(coords.x, 0, imageSize[0], 0, imgWidth);
+					var y = p.map(coords.y, 0, imageSize[1], 0, imgHeight);
 					p.fill(params.dotColor);
 					p.noStroke();
 					p.ellipse(x, y, params.annotationSize, params.annotationSize);
@@ -74,7 +75,7 @@ var sketch = function(p) {
 			}
 		}
 
-		if(params.isAnimating) {
+		if(params.isAnimating && (p.frameCount % 5 == 0)) {
 			params.dataIndex = params.dataIndex+1
 			loadData();
 			console.log('animating!', params.dataIndex);
@@ -111,9 +112,10 @@ var sketch = function(p) {
 	function loadData(i) {
 		var index = i || params.dataIndex;
 		var item = _data[index-1];
-		imageName = item[0];
+		imageName = item[0][0];
+		imageSize = [item[0][1], item[0][2]];
 		annotations = item[1].map(function(d) { return {x:d[0], y:d[1]} });
-		img = p.loadImage('assets/images/'+imageName+'.jpg');
+		img = p.loadImage('assets/images/'+imageName);
 	}
 
 	// function loadData(i) {

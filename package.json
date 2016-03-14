@@ -21,8 +21,9 @@
     "p5": "^0.4.23"
   },
   "devDependencies": {
+    "budo": "~7.1.0",
     "glslify": "~5.0.0",
-    "budo": "~7.1.0"
+    "image-size": "^0.4.0"
   },
   "repository": {
     "type": "git",
