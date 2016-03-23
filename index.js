@@ -37,6 +37,7 @@ var sketch = function(p) {
 		gui.addColor(params, 'dotColor');
 		gui.add(params, 'dataIndex')
 			.step(1)
+			.listen()
 			.onChange(loadData);
 	}
 
@@ -49,17 +50,18 @@ var sketch = function(p) {
 		if(img) {
 
 			// rescale to fit canvas
-			if(img.width > img.height) {
-				imgWidth = p.width;
-				imgHeight = imageSize[0]*(p.width/img.width);
-			} else {
+			// if(imageSize[0] > imageSize[1]) {
+			// 	imgWidth = p.width;
+			// 	imgHeight = imageSize[1]*(imgWidth/imageSize[0]);
+			// } else {
 				imgHeight = p.height;
-				imgWidth = imageSize[1]*(p.height/img.height);
-			}
+				imgWidth = imageSize[0]*(imgHeight/imageSize[1]);
+			// }
 
 			p.translate((p.width-imgWidth)/2, (p.height-imgHeight)/2);
 
 			if(params.showImage) {
+				console.log('check image ratios', img.width/img.height, imgWidth/imgHeight);
 				p.image(img, 0, 0, imgWidth, imgHeight);
 			}
 
