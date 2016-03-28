@@ -6,7 +6,10 @@
   "license": "MIT",
   "scripts": {
     "start": "budo index.js --open --live --css styles.css",
-    "parse": "node scripts/parse.js"
+    "parse": "node scripts/parse.js",
+    "build": "budo-demo index.js -c styles.css -i assets",
+    "deploy": "npm run build; gh-pages -d dist; npm run clean",
+    "clean": "rm -r dist"
   },
   "author": {
     "name": "Andy Dayton",
@@ -14,15 +17,13 @@
     "url": "http://andydayton.com/"
   },
   "dependencies": {
-    "a-big-triangle": "~1.0.2",
     "exdat": "^0.6.2",
-    "gl-now": "~1.4.0",
-    "gl-shader": "~4.1.1",
     "p5": "^0.4.23"
   },
   "devDependencies": {
     "budo": "~7.1.0",
-    "glslify": "~5.0.0",
+    "gh-pages": "^0.11.0",
+    "budo-demo": "0.0.4",
     "image-size": "^0.4.0"
   },
   "repository": {
