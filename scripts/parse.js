@@ -6,6 +6,7 @@ var fs = require('fs')
 var dir = path.resolve(__dirname, '../assets/annotations');
 
 var out = [];
+var csv = '';
 
 fs.readdir(dir, function(err, files) {
 	if(err) throw err;
@@ -45,7 +46,12 @@ fs.readdir(dir, function(err, files) {
 	// remove null at beginning
 	out.shift();
 
+	csv = out.map(function(d, i) {
+		return i + ',' + d[0].join(',');
+	}).join("\n");
+
 	// write file
 	fs.writeFile(path.resolve(__dirname, '../assets/annotations.json'), JSON.stringify(out), 'utf8');
+	fs.writeFile(path.resolve(__dirname, '../assets/helen.csv'), csv, 'utf8');
 	
 });

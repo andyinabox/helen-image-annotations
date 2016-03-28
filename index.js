@@ -1,6 +1,8 @@
 var p5 = require('p5');
 var dat = require('exdat');
 
+var S3_PATH = "https://s3.amazonaws.com/helen-images/images/";
+
 // var dataIndex = 1;
 var imageName = "";
 var imageSize = [];
@@ -17,6 +19,7 @@ var params = {
 	, annotationSize: 3
 	, dotColor: [255, 255, 255]
 	, dataIndex: 1
+	, animationFrames: 10
 	, isAnimating: false
 }
 
@@ -39,6 +42,8 @@ var sketch = function(p) {
 			.step(1)
 			.listen()
 			.onChange(loadData);
+		gui.add(params, 'isAnimating').listen();
+		gui.add(params, 'animationFrames', 0, 500);
 	}
 
 	p.draw = function() {
@@ -61,7 +66,7 @@ var sketch = function(p) {
 			p.translate((p.width-imgWidth)/2, (p.height-imgHeight)/2);
 
 			if(params.showImage) {
-				console.log('check image ratios', img.width/img.height, imgWidth/imgHeight);
+				// console.log('check image ratios', img.width/img.height, imgWidth/imgHeight);
 				p.image(img, 0, 0, imgWidth, imgHeight);
 			}
 
@@ -77,10 +82,10 @@ var sketch = function(p) {
 			}
 		}
 
-		if(params.isAnimating && (p.frameCount % 5 == 0)) {
+		if(params.isAnimating && (p.frameCount % params.animationFrames == 0)) {
 			params.dataIndex = params.dataIndex+1
 			loadData();
-			console.log('animating!', params.dataIndex);
+			// console.log('animating!', params.dataIndex);
 		}
 
 	}
@@ -117,7 +122,7 @@ var sketch = function(p) {
 		imageName = item[0][0];
 		imageSize = [item[0][1], item[0][2]];
 		annotations = item[1].map(function(d) { return {x:d[0], y:d[1]} });
-		img = p.loadImage('assets/images/'+imageName);
+		img = p.loadImage(S3_PATH+imageName);
 	}
 
 	// function loadData(i) {
