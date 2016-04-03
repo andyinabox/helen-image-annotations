@@ -5,9 +5,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "budo index.js --open --live --css styles.css",
+    "start": "budo index.js --open --live --css styles.css --title 'Helen Imageset Annotations'",
     "parse": "node scripts/parse.js",
-    "build": "budo-demo index.js -c styles.css -i assets",
+    "build": "budo-demo index.js -c styles.css -i assets --title 'Helen Imageset Annotations'",
     "deploy": "npm run build; gh-pages -d dist; npm run clean",
     "clean": "rm -r dist"
   },
@@ -17,7 +17,10 @@
     "url": "http://andydayton.com/"
   },
   "dependencies": {
+    "browserify": "^13.0.0",
+    "browserify-shim": "^3.8.12",
     "exdat": "^0.6.2",
+    "flickrapi": "^0.4.2",
     "p5": "^0.4.23"
   },
   "devDependencies": {
@@ -33,5 +36,14 @@
   "homepage": "https://github.com/andyinabox/helen-image-annotations",
   "bugs": {
     "url": "https://github.com/andyinabox/helen-image-annotations/issues"
+  },
+  "browser": {
+    "flickrapi": "./node_modules/flickrapi/browser/flickrapi.js"
+  },
+  "browserify-shim": {
+    "flickrapi": "Flickr"
+  },
+  "browserify": {
+    "transform": ["browserify-shim"]
   }
 }

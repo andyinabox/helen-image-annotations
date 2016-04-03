@@ -1,5 +1,6 @@
 var p5 = require('p5');
 var dat = require('exdat');
+var Flickr = require('flickrapi');
 
 var S3_PATH = "https://s3.amazonaws.com/helen-images/images/";
 
@@ -23,6 +24,12 @@ var params = {
 	, isAnimating: false
 }
 
+console.log('Flickr', Flickr);
+
+var flickr = new Flickr({
+	api_key: "f1d7f8566434449bf8b19e8e7b9b2b0c"
+});
+
 var sketch = function(p) {
 	p.preload = function() {
 		_data = p.loadJSON('assets/annotations.json', function() { loadData(); });
@@ -44,6 +51,13 @@ var sketch = function(p) {
 			.onChange(loadData);
 		gui.add(params, 'isAnimating').listen();
 		gui.add(params, 'animationFrames', 0, 500);
+
+		flickr.photos.getInfo({
+			photo_id: 111168419
+		}, function(err, result) {
+			if(err) { throw new Error(err); }
+			console.log('Flickr result', result);
+		});
 	}
 
 	p.draw = function() {
