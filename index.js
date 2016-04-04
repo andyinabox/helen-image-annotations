@@ -13,7 +13,7 @@ var canvas;
 var _data;
 
 
-var gui;
+var gui, guiF1, guiF2;
 var params = {
 	showImage: true
 	, showAnnotations: true
@@ -22,6 +22,11 @@ var params = {
 	, dataIndex: 1
 	, animationFrames: 10
 	, isAnimating: false
+}
+
+var imageInfo = {
+	link: '',
+	title: ''
 }
 
 console.log('Flickr', Flickr);
@@ -40,24 +45,22 @@ var sketch = function(p) {
 		canvas = p.createCanvas(p.windowWidth, p.windowHeight);
 
 		gui = new dat.GUI();
+		guiControls = gui.addFolder('Controls');
+		guiImageInfo = gui.addFolder('Image Info');
 
-		gui.add(params, 'showImage');
-		gui.add(params, 'showAnnotations');
-		gui.add(params, 'annotationSize');
-		gui.addColor(params, 'dotColor');
-		gui.add(params, 'dataIndex')
+		guiControls.add(params, 'showImage');
+		guiControls.add(params, 'showAnnotations');
+		guiControls.add(params, 'annotationSize');
+		guiControls.addColor(params, 'dotColor');
+		guiControls.add(params, 'dataIndex')
 			.step(1)
 			.listen()
 			.onChange(loadData);
-		gui.add(params, 'isAnimating').listen();
-		gui.add(params, 'animationFrames', 0, 500);
+		guiControls.add(params, 'isAnimating').listen();
+		guiControls.add(params, 'animationFrames', 0, 500);
 
-		flickr.photos.getInfo({
-			photo_id: 111168419
-		}, function(err, result) {
-			if(err) { throw new Error(err); }
-			console.log('Flickr result', result);
-		});
+		guiImageInfo.add(imageInfo, 'link').listen();
+		guiImageInfo.add(imageInfo, 'title').listen();
 	}
 
 	p.draw = function() {
@@ -133,10 +136,30 @@ var sketch = function(p) {
 	function loadData(i) {
 		var index = i || params.dataIndex;
 		var item = _data[index-1];
+		var id;
 		imageName = item[0][0];
 		imageSize = [item[0][1], item[0][2]];
 		annotations = item[1].map(function(d) { return {x:d[0], y:d[1]} });
 		img = p.loadImage(S3_PATH+imageName);
+
+		// quick & dirty way to get id
+		id = imageName.split('.')[0].split('_')[0];
+
+		flickr.photos.getInfo({
+			photo_id: id
+		}, function(err, result) {
+			if(err) {
+				imageInfo.link = 'not available';
+				imageInfo.title = 'not available'
+			} else {
+				var link = result.photo.urls.url[0]._content;
+				var title = result.photo.title._content
+
+				imageInfo.link = link || '';
+				imageInfo.title = title || '';
+			// console.log('Image loaded', url, result);
+			}
+		});
 	}
 
 	// function loadData(i) {
