@@ -1,6 +1,9 @@
 var p5 = require('p5');
 var dat = require('exdat');
 var Flickr = require('flickrapi');
+var _ = require('lodash');
+var query = require('url-query')();
+
 
 var S3_PATH = "https://s3.amazonaws.com/helen-images/images/";
 
@@ -11,10 +14,13 @@ var annotations;
 var img;
 var canvas;
 var _data;
-
-
 var gui, guiF1, guiF2;
-var params = {
+
+if(query.dataIndex) {
+	query.dataIndex = parseInt(query.dataIndex);
+}
+
+var params = _.defaults(query, {
 	showImage: true
 	, showAnnotations: true
 	, annotationSize: 3
@@ -22,7 +28,7 @@ var params = {
 	, dataIndex: 1
 	, animationFrames: 10
 	, isAnimating: false
-}
+})
 
 var imageInfo = {
 	link: '',

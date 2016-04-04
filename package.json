@@ -21,7 +21,9 @@
     "browserify-shim": "^3.8.12",
     "exdat": "^0.6.2",
     "flickrapi": "^0.4.2",
-    "p5": "^0.4.23"
+    "lodash": "^4.7.0",
+    "p5": "^0.4.23",
+    "url-query": "^1.0.3"
   },
   "devDependencies": {
     "budo": "~7.1.0",
@@ -44,6 +46,8 @@
     "flickrapi": "Flickr"
   },
   "browserify": {
-    "transform": ["browserify-shim"]
+    "transform": [
+      "browserify-shim"
+    ]
   }
 }
