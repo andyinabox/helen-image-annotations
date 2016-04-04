@@ -3,7 +3,7 @@ var p5 = require('p5');
 var dat = require('exdat');
 var Flickr = require('flickrapi');
 var _ = require('lodash');
-var query = require('url-query')();
+var qs = require('querystring');
 
 
 var S3_PATH = "https://s3.amazonaws.com/helen-images/images/";
@@ -16,6 +16,11 @@ var img;
 var canvas;
 var _data;
 var gui, guiF1, guiF2;
+var query = {};
+
+if(window.location.search) {
+	query = qs.parse(window.location.search.slice(1));
+}
 
 if(query.dataIndex) {
 	query.dataIndex = parseInt(query.dataIndex);
@@ -194,7 +199,186 @@ var sketch = function(p) {
 }
 
 new p5(sketch);
-},{"exdat":23,"flickrapi":24,"lodash":25,"p5":26,"url-query":27}],2:[function(require,module,exports){
+},{"exdat":26,"flickrapi":27,"lodash":28,"p5":29,"querystring":4}],2:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+// If obj.hasOwnProperty has been overridden, then calling
+// obj.hasOwnProperty(prop) will break.
+// See: https://github.com/joyent/node/issues/1707
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+module.exports = function(qs, sep, eq, options) {
+  sep = sep || '&';
+  eq = eq || '=';
+  var obj = {};
+
+  if (typeof qs !== 'string' || qs.length === 0) {
+    return obj;
+  }
+
+  var regexp = /\+/g;
+  qs = qs.split(sep);
+
+  var maxKeys = 1000;
+  if (options && typeof options.maxKeys === 'number') {
+    maxKeys = options.maxKeys;
+  }
+
+  var len = qs.length;
+  // maxKeys <= 0 means that we should not limit keys count
+  if (maxKeys > 0 && len > maxKeys) {
+    len = maxKeys;
+  }
+
+  for (var i = 0; i < len; ++i) {
+    var x = qs[i].replace(regexp, '%20'),
+        idx = x.indexOf(eq),
+        kstr, vstr, k, v;
+
+    if (idx >= 0) {
+      kstr = x.substr(0, idx);
+      vstr = x.substr(idx + 1);
+    } else {
+      kstr = x;
+      vstr = '';
+    }
+
+    k = decodeURIComponent(kstr);
+    v = decodeURIComponent(vstr);
+
+    if (!hasOwnProperty(obj, k)) {
+      obj[k] = v;
+    } else if (isArray(obj[k])) {
+      obj[k].push(v);
+    } else {
+      obj[k] = [obj[k], v];
+    }
+  }
+
+  return obj;
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+},{}],3:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+var stringifyPrimitive = function(v) {
+  switch (typeof v) {
+    case 'string':
+      return v;
+
+    case 'boolean':
+      return v ? 'true' : 'false';
+
+    case 'number':
+      return isFinite(v) ? v : '';
+
+    default:
+      return '';
+  }
+};
+
+module.exports = function(obj, sep, eq, name) {
+  sep = sep || '&';
+  eq = eq || '=';
+  if (obj === null) {
+    obj = undefined;
+  }
+
+  if (typeof obj === 'object') {
+    return map(objectKeys(obj), function(k) {
+      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+      if (isArray(obj[k])) {
+        return map(obj[k], function(v) {
+          return ks + encodeURIComponent(stringifyPrimitive(v));
+        }).join(sep);
+      } else {
+        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+      }
+    }).join(sep);
+
+  }
+
+  if (!name) return '';
+  return encodeURIComponent(stringifyPrimitive(name)) + eq +
+         encodeURIComponent(stringifyPrimitive(obj));
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+function map (xs, f) {
+  if (xs.map) return xs.map(f);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    res.push(f(xs[i], i));
+  }
+  return res;
+}
+
+var objectKeys = Object.keys || function (obj) {
+  var res = [];
+  for (var key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
+  }
+  return res;
+};
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
+exports.decode = exports.parse = require('./decode');
+exports.encode = exports.stringify = require('./encode');
+
+},{"./decode":2,"./encode":3}],5:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -377,7 +561,7 @@ function recalculateHSV(color) {
 
 }
 
-},{"../utils/common.js":19,"./interpret.js":3,"./math.js":4,"./toString.js":5}],3:[function(require,module,exports){
+},{"../utils/common.js":22,"./interpret.js":6,"./math.js":7,"./toString.js":8}],6:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -720,7 +904,7 @@ function createInterpert() {
 
 }
 
-},{"../utils/common.js":19,"./toString.js":5}],4:[function(require,module,exports){
+},{"../utils/common.js":22,"./toString.js":8}],7:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -821,7 +1005,7 @@ function math() {
   };
 }
 
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -858,7 +1042,7 @@ function toString(color) {
 
 }
 
-},{"../utils/common.js":19}],6:[function(require,module,exports){
+},{"../utils/common.js":22}],9:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -942,7 +1126,7 @@ common.extend(
   }
 );
 
-},{"../dom/dom.js":17,"../utils/common.js":19,"./Controller.js":8}],7:[function(require,module,exports){
+},{"../dom/dom.js":20,"../utils/common.js":22,"./Controller.js":11}],10:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -1263,7 +1447,7 @@ function hueGradient(elem) {
   elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
 }
 
-},{"../color/Color.js":2,"../color/interpret.js":3,"../dom/dom.js":17,"../utils/common.js":19,"./Controller.js":8}],8:[function(require,module,exports){
+},{"../color/Color.js":5,"../color/interpret.js":6,"../dom/dom.js":20,"../utils/common.js":22,"./Controller.js":11}],11:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -1404,7 +1588,7 @@ common.extend(
 );
 
 
-},{"../utils/common.js":19,"../utils/escapeHtml.js":21}],9:[function(require,module,exports){
+},{"../utils/common.js":22,"../utils/escapeHtml.js":24}],12:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -1474,7 +1658,7 @@ common.extend(
 
 );
 
-},{"../dom/dom.js":17,"../utils/common.js":19,"./Controller.js":8}],10:[function(require,module,exports){
+},{"../dom/dom.js":20,"../utils/common.js":22,"./Controller.js":11}],13:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -1616,7 +1800,7 @@ function numDecimals(x) {
   }
 }
 
-},{"../utils/common.js":19,"./Controller.js":8}],11:[function(require,module,exports){
+},{"../utils/common.js":22,"./Controller.js":11}],14:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -1747,7 +1931,7 @@ function roundToDecimal(value, decimals) {
   return Math.round(value * tenTo) / tenTo;
 }
 
-},{"../dom/dom.js":17,"../utils/common.js":19,"./NumberController.js":10}],12:[function(require,module,exports){
+},{"../dom/dom.js":20,"../utils/common.js":22,"./NumberController.js":13}],15:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -1877,7 +2061,7 @@ function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
 }
 
-},{"../dom/dom.js":17,"../utils/common.js":19,"../utils/css.js":20,"./NumberController.js":10}],13:[function(require,module,exports){
+},{"../dom/dom.js":20,"../utils/common.js":22,"../utils/css.js":23,"./NumberController.js":13}],16:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -1977,7 +2161,7 @@ common.extend(
 
 );
 
-},{"../dom/dom.js":17,"../utils/common.js":19,"./Controller.js":8}],14:[function(require,module,exports){
+},{"../dom/dom.js":20,"../utils/common.js":22,"./Controller.js":11}],17:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -2064,7 +2248,7 @@ common.extend(
 
 );
 
-},{"../dom/dom.js":17,"../utils/common.js":19,"./Controller.js":8}],15:[function(require,module,exports){
+},{"../dom/dom.js":20,"../utils/common.js":22,"./Controller.js":11}],18:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -2130,7 +2314,7 @@ function factory(object, property) {
 
 }
 
-},{"../utils/common.js":19,"./BooleanController.js":6,"./FunctionController.js":9,"./NumberControllerBox.js":11,"./NumberControllerSlider.js":12,"./OptionController.js":13,"./StringController.js":14}],16:[function(require,module,exports){
+},{"../utils/common.js":22,"./BooleanController.js":9,"./FunctionController.js":12,"./NumberControllerBox.js":14,"./NumberControllerSlider.js":15,"./OptionController.js":16,"./StringController.js":17}],19:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -2244,7 +2428,7 @@ function lockScroll(e) {
   console.log(e);
 }
 
-},{"../utils/common.js":19,"./dom.js":17}],17:[function(require,module,exports){
+},{"../utils/common.js":22,"./dom.js":20}],20:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -2531,7 +2715,7 @@ var dom = {
 
 module.exports = dom;
 
-},{"../utils/common.js":19}],18:[function(require,module,exports){
+},{"../utils/common.js":22}],21:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -3933,7 +4117,7 @@ function createGUI() {
   return GUI;
 }
 
-},{"../controllers/BooleanController.js":6,"../controllers/ColorController.js":7,"../controllers/Controller.js":8,"../controllers/FunctionController.js":9,"../controllers/NumberControllerBox.js":11,"../controllers/NumberControllerSlider.js":12,"../controllers/factory.js":15,"../dom/CenteredDiv.js":16,"../dom/dom.js":17,"../utils/common.js":19,"../utils/css.js":20,"../utils/requestAnimationFrame.js":22}],19:[function(require,module,exports){
+},{"../controllers/BooleanController.js":9,"../controllers/ColorController.js":10,"../controllers/Controller.js":11,"../controllers/FunctionController.js":12,"../controllers/NumberControllerBox.js":14,"../controllers/NumberControllerSlider.js":15,"../controllers/factory.js":18,"../dom/CenteredDiv.js":19,"../dom/dom.js":20,"../utils/common.js":22,"../utils/css.js":23,"../utils/requestAnimationFrame.js":25}],22:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -4075,7 +4259,7 @@ function common() {
   };
 }
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -4110,7 +4294,7 @@ function css() {
   };
 }
 
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = escape;
 
 var entityMap = {
@@ -4128,7 +4312,7 @@ function escape(string) {
   });
 }
 
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -4161,7 +4345,7 @@ function raf() {
       };
 }
 
-},{}],23:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /** @license
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -4201,7 +4385,7 @@ module.exports = {
   GUI: require('./dat/gui/GUI.js')
 };
 
-},{"./dat/color/Color.js":2,"./dat/color/interpret.js":3,"./dat/color/math.js":4,"./dat/controllers/BooleanController.js":6,"./dat/controllers/ColorController.js":7,"./dat/controllers/Controller.js":8,"./dat/controllers/FunctionController.js":9,"./dat/controllers/NumberController.js":10,"./dat/controllers/NumberControllerBox.js":11,"./dat/controllers/NumberControllerSlider.js":12,"./dat/controllers/OptionController.js":13,"./dat/controllers/StringController.js":14,"./dat/dom/dom.js":17,"./dat/gui/GUI.js":18}],24:[function(require,module,exports){
+},{"./dat/color/Color.js":5,"./dat/color/interpret.js":6,"./dat/color/math.js":7,"./dat/controllers/BooleanController.js":9,"./dat/controllers/ColorController.js":10,"./dat/controllers/Controller.js":11,"./dat/controllers/FunctionController.js":12,"./dat/controllers/NumberController.js":13,"./dat/controllers/NumberControllerBox.js":14,"./dat/controllers/NumberControllerSlider.js":15,"./dat/controllers/OptionController.js":16,"./dat/controllers/StringController.js":17,"./dat/dom/dom.js":20,"./dat/gui/GUI.js":21}],27:[function(require,module,exports){
 (function (global){
 ; var __browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 (function() {
@@ -6075,7 +6259,7 @@ Utils.handleURLRequest = function (verb, url, processResult, postdata) {
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],25:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -21947,7 +22131,7 @@ Utils.handleURLRequest = function (verb, url, processResult, postdata) {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],26:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 (function (global){
 /*! p5.js v0.4.23 March 04, 2016 */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.p5 = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
@@ -51715,20 +51899,4 @@ module.exports = p5;
 },{"../core/core":48}]},{},[39])(39)
 });
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],27:[function(require,module,exports){
-module.exports = function queryString(search) {
-  var queryString = search || typeof location !== 'undefined' && location.search;
-  if (!queryString) throw new TypeError('search argument missing');
-
-  queryString = queryString.trim().replace(/^(\?)/, '');
-  queryString = queryString.split('&');
-
-  var query = {};
-  queryString.forEach(function(q) {
-    var segment = q.split('=');
-    query[segment[0]] = segment.length > 1 ? segment[1] : true;
-  });
-
-  return query;
-};
 },{}]},{},[1]);
