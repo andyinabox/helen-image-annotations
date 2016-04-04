@@ -1,6 +1,6 @@
 {
   "name": "helen-image-annotations",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "main": "index.js",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "flickrapi": "^0.4.2",
     "lodash": "^4.7.0",
     "p5": "^0.4.23",
-    "url-query": "^1.0.3"
+    "querystring": "^0.2.0"
   },
   "devDependencies": {
     "budo": "~7.1.0",

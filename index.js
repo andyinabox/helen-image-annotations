@@ -2,7 +2,7 @@ var p5 = require('p5');
 var dat = require('exdat');
 var Flickr = require('flickrapi');
 var _ = require('lodash');
-var query = require('url-query')();
+var qs = require('querystring');
 
 
 var S3_PATH = "https://s3.amazonaws.com/helen-images/images/";
@@ -15,6 +15,11 @@ var img;
 var canvas;
 var _data;
 var gui, guiF1, guiF2;
+var query = {};
+
+if(window.location.search) {
+	query = qs.parse(window.location.search.slice(1));
+}
 
 if(query.dataIndex) {
 	query.dataIndex = parseInt(query.dataIndex);
