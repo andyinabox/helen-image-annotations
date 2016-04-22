@@ -188,6 +188,10 @@ var sketch = function(p) {
 			p.saveCanvas(canvas, 'HELEN_'+params.dataIndex+'.jpg');
 		} else if (p.key === ' ') {
 			toggleAnimation();
+		} else if (p.key === 'o') {
+			if(imageInfo && imageInfo.link) {
+				window.open(imageInfo.link, '_blank');
+			}
 		}
 	}
 
