@@ -6,6 +6,8 @@ var qs = require('querystring');
 
 
 var S3_PATH = "https://s3.amazonaws.com/helen-images/images/";
+// var JSON_PATH = "assets/annotations.json";
+var JSON_PATH = "https://s3.amazonaws.com/helen-images/annotations.json";
 
 // var dataIndex = 1;
 var imageName = "";
@@ -42,7 +44,7 @@ var params = _.defaults(query, {
 	, textSize: 10
 	, annotationSize: 3
 	, dotColor: [255, 255, 255]
-	, centroidColor: [255, 0, 0]
+	, centroidColor: [0, 0, 255]
 	, dataIndex: 1
 	, animationFrames: 10
 	, isAnimating: false
@@ -61,7 +63,7 @@ var flickr = new Flickr({
 
 var sketch = function(p) {
 	p.preload = function() {
-		_data = p.loadJSON('assets/annotations.json', function() { loadData(); });
+		_data = p.loadJSON(JSON_PATH, function() { loadData(); });
 	}
 
 	p.setup = function() {
