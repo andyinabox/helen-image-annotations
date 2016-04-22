@@ -26,10 +26,12 @@
     "querystring": "^0.2.0"
   },
   "devDependencies": {
+    "aws-sdk": "^2.3.5",
     "budo": "~7.1.0",
-    "gh-pages": "^0.11.0",
     "budo-demo": "0.0.4",
-    "image-size": "^0.4.0"
+    "gh-pages": "^0.11.0",
+    "image-size": "^0.4.0",
+    "lwip": "0.0.8"
   },
   "repository": {
     "type": "git",
