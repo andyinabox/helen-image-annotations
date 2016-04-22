@@ -16,15 +16,22 @@ var csv = '';
 fs.readdir(ANNOTATIONS_DIR, function(err, files) {
 	if(err) throw err;
 
-	var remaining = 10;
+	var remaining = files.length-1;
 
 	next(0);
 
-	function next(index) {
-		var f = files[index]
+	function next(currentIndex) {
+		console.log('NEXT: '+currentIndex);
+
+		if(currentIndex >= files.length) {
+			console.log('Attempted to access invalid index ('+currentIndex+')');
+			return;
+		}
+
+		var f = files[currentIndex]
 			, basename = path.basename(f, '.txt')
 			, data = fs.readFileSync(path.resolve(ANNOTATIONS_DIR, f), 'utf8')
-			, index = parseInt(basename)
+			, imageIndex = parseInt(basename)
 			, lines = data.toString().split("\n")
 			, imageName = lines.shift().replace(/\s/g, '') + '.jpg'
 			// , imagePath = path.resolve(__dirname, '../assets/images/'+imageName)
@@ -32,7 +39,6 @@ fs.readdir(ANNOTATIONS_DIR, function(err, files) {
 			, imageSize
 			, image = [imageName, null, null]
 			, annotations;
-
 
 		// remove empty line at end
 		lines.pop();
@@ -43,30 +49,31 @@ fs.readdir(ANNOTATIONS_DIR, function(err, files) {
 			return [parseFloat(parts[0]), parseFloat(parts[1])];
 		}); 
 
-		out[index] = [image, annotations];
+		console.log('imageIndex: '+imageIndex)
+		out[imageIndex] = [image, annotations];
 
 		var getObjectParams = {
 			Bucket: HELEN_BUCKET
 			, Key: imagePath
 		}
 
-		console.log('attempt to get '+getObjectParams.Key);
+		// console.log('attempt to get '+getObjectParams.Key);
 
 		s3.getObject(getObjectParams, function(err, data) {
 			if(err) {
-				checkDone(err, index);
+				checkDone(err, currentIndex);
 			} else {
-				console.log('got response for '+getObjectParams.Key);
+				// console.log('got response for '+getObjectParams.Key);
 
 				lwip.open(data.Body, "jpg", function(err, imgObj) {
 					if(err) {
-						checkDone(err, index);
+						checkDone(err, currentIndex);
 					} else {
 						// set height/width
 						image[1] = imgObj.width();
 						image[2] = imgObj.height();
 						console.log('updated image', image);
-						checkDone(null, index);
+						checkDone(null, currentIndex);
 					}
 				});
 			}
@@ -86,6 +93,8 @@ fs.readdir(ANNOTATIONS_DIR, function(err, files) {
 
 	function checkDone(err, currentIndex) {
 		if(err) console.log(err);
+
+		console.log("DONE: "+currentIndex);
 
 		remaining--;
 
