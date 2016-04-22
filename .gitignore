@@ -3,3 +3,5 @@ node_modules
 .DS_Store
 bundle.js
 dist
+assets/*.json
+assets/*.csv

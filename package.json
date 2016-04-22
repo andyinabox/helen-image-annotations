@@ -1,13 +1,13 @@
 {
   "name": "helen-image-annotations",
-  "version": "1.1.2",
+  "version": "1.2.1",
   "description": "",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "start": "budo index.js --open --live --css styles.css --title 'Helen Imageset Annotations'",
     "parse": "node scripts/parse.js",
-    "build": "budo-demo index.js -c styles.css -i assets --title 'Helen Imageset Annotations'",
+    "build": "budo-demo index.js -c styles.css --title 'Helen Imageset Annotations'",
     "deploy": "npm run build; gh-pages -d dist; npm run clean",
     "clean": "rm -r dist"
   },
