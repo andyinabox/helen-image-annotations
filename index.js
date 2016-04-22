@@ -74,6 +74,7 @@ var sketch = function(p) {
 
 		gui = new dat.GUI();
 		guiControls = gui.addFolder('Controls');
+		guiStyles = gui.addFolder('Styles');
 		guiImageInfo = gui.addFolder('Image Info');
 
 		guiControls.add(params, 'showImage');
@@ -82,17 +83,18 @@ var sketch = function(p) {
 		guiControls.add(params, 'showCentroids');
 		guiControls.add(params, 'centerFace');
 		guiControls.add(params, 'targetArea');
-		guiControls.add(params, 'textSize');
-		guiControls.add(params, 'annotationSize');
-		guiControls.addColor(params, 'dotColor');
-		guiControls.addColor(params, 'centroidColor');
-		guiControls.add(params, 'dataIndex')
+		// guiControls.add(params, 'isAnimating').listen();
+		guiControls.add(params, 'animationFrames', 1, 500).step(1);
+		
+		guiStyles.add(params, 'textSize');
+		guiStyles.add(params, 'annotationSize');
+		guiStyles.addColor(params, 'dotColor');
+		guiStyles.addColor(params, 'centroidColor');
+
+		guiImageInfo.add(params, 'dataIndex')
 			.step(1)
 			.listen()
 			.onChange(loadData);
-		guiControls.add(params, 'isAnimating').listen();
-		guiControls.add(params, 'animationFrames', 1, 500).step(1);
-
 		guiImageInfo.add(imageInfo, 'link').listen();
 		guiImageInfo.add(imageInfo, 'title').listen();
 	}
