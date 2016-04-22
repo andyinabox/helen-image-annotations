@@ -28,6 +28,8 @@ if(query.dataIndex) {
 var params = _.defaults(query, {
 	showImage: true
 	, showAnnotations: true
+	, showIndexes: true
+	, textSize: 10
 	, annotationSize: 3
 	, dotColor: [255, 255, 255]
 	, dataIndex: 1
@@ -61,6 +63,8 @@ var sketch = function(p) {
 
 		guiControls.add(params, 'showImage');
 		guiControls.add(params, 'showAnnotations');
+		guiControls.add(params, 'showIndexes');
+		guiControls.add(params, 'textSize');
 		guiControls.add(params, 'annotationSize');
 		guiControls.addColor(params, 'dotColor');
 		guiControls.add(params, 'dataIndex')
@@ -79,6 +83,10 @@ var sketch = function(p) {
 			, imgHeight;
 
 		p.background(0);
+
+		p.textAlign(p.CENTER);
+		p.textSize(params.textSize);
+
 
 		if(img) {
 
@@ -100,12 +108,19 @@ var sketch = function(p) {
 
 			if(params.showAnnotations) {
 
-				annotations.forEach(function(coords) {
+				annotations.forEach(function(coords, index) {
 					var x = p.map(coords.x, 0, imageSize[0], 0, imgWidth);
 					var y = p.map(coords.y, 0, imageSize[1], 0, imgHeight);
 					p.fill(params.dotColor);
 					p.noStroke();
-					p.ellipse(x, y, params.annotationSize, params.annotationSize);
+					// p.ellipse(x, y, params.annotationSize, params.annotationSize);
+
+					if(params.showIndexes) {
+						p.text(index+"", x, y);
+					} else {
+						p.ellipse(x, y, params.annotationSize, params.annotationSize);
+					}
+
 				});
 			}
 		}
