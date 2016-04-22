@@ -18,6 +18,15 @@ var _data;
 var gui, guiF1, guiF2;
 var query = {};
 
+var RIGHT_EYE_START = 114;
+var RIGHT_EYE_END = 133;
+var LEFT_EYE_START = 134;
+var LEFT_EYE_END = 153;
+var MOUTH_OUTLINE_START = 58;
+var MOUTH_OUTLINE_END = 85;
+
+
+
 if(window.location.search) {
 	query = qs.parse(window.location.search.slice(1));
 }
@@ -29,8 +38,12 @@ if(query.dataIndex) {
 var params = _.defaults(query, {
 	showImage: true
 	, showAnnotations: true
+	, showIndexes: false
+	, showCentroids: true
+	, textSize: 10
 	, annotationSize: 3
 	, dotColor: [255, 255, 255]
+	, centroidColor: [255, 0, 0]
 	, dataIndex: 1
 	, animationFrames: 10
 	, isAnimating: false
@@ -62,8 +75,12 @@ var sketch = function(p) {
 
 		guiControls.add(params, 'showImage');
 		guiControls.add(params, 'showAnnotations');
+		guiControls.add(params, 'showIndexes');
+		guiControls.add(params, 'showCentroids');
+		guiControls.add(params, 'textSize');
 		guiControls.add(params, 'annotationSize');
 		guiControls.addColor(params, 'dotColor');
+		guiControls.addColor(params, 'centroidColor');
 		guiControls.add(params, 'dataIndex')
 			.step(1)
 			.listen()
@@ -80,6 +97,10 @@ var sketch = function(p) {
 			, imgHeight;
 
 		p.background(0);
+
+		p.textAlign(p.CENTER);
+		p.textSize(params.textSize);
+
 
 		if(img) {
 
@@ -101,13 +122,47 @@ var sketch = function(p) {
 
 			if(params.showAnnotations) {
 
-				annotations.forEach(function(coords) {
-					var x = p.map(coords.x, 0, imageSize[0], 0, imgWidth);
-					var y = p.map(coords.y, 0, imageSize[1], 0, imgHeight);
+				annotations.forEach(function(coords, index) {
+					var point = mapPoint(coords, imageSize, [imgWidth, imgHeight]);
+
 					p.fill(params.dotColor);
 					p.noStroke();
-					p.ellipse(x, y, params.annotationSize, params.annotationSize);
+					// p.ellipse(x, y, params.annotationSize, params.annotationSize);
+
+					if(params.showIndexes) {
+						p.text(index+"", point.x, point.y);
+					} else {
+						p.ellipse(point.x, point.y, params.annotationSize, params.annotationSize);
+					}
+
 				});
+
+				if(params.showCentroids) {
+					var leftEyeCentroid = mapPoint(
+						findCentroid(annotations.slice(LEFT_EYE_START, LEFT_EYE_END+1))
+						, imageSize
+						, [imgWidth, imgHeight]
+					);
+					var rightEyeCentroid = mapPoint(
+						findCentroid(annotations.slice(RIGHT_EYE_START, RIGHT_EYE_END+1))
+						, imageSize
+						, [imgWidth, imgHeight]
+					);
+					var mouthCentroid = mapPoint(
+						findCentroid(annotations.slice(MOUTH_OUTLINE_START, MOUTH_OUTLINE_END+1))
+						, imageSize
+						, [imgWidth, imgHeight]
+					);
+
+					p.push();
+						p.noStroke();
+						p.fill(params.centroidColor);
+						p.ellipse(leftEyeCentroid.x, leftEyeCentroid.y, params.annotationSize, params.annotationSize);
+						p.ellipse(rightEyeCentroid.x, rightEyeCentroid.y, params.annotationSize, params.annotationSize);
+						p.ellipse(mouthCentroid.x, mouthCentroid.y, params.annotationSize, params.annotationSize);
+					p.pop();
+				}
+
 			}
 		}
 
@@ -172,6 +227,24 @@ var sketch = function(p) {
 			// console.log('Image loaded', url, result);
 			}
 		});
+	}
+
+	function mapPoint(point, imgBaseSize, imgTargetSize) {
+		return {
+			x: p.map(point.x, 0, imgBaseSize[0], 0, imgTargetSize[0])
+			, y: p.map(point.y, 0, imgBaseSize[1], 0, imgTargetSize[1])
+		};
+	}
+
+	function findCentroid(points) {
+		var len = points.length
+			, avgX
+			, avgY;
+
+		avgX = points.reduce(function(a, b) { return a + b.x; }, 0)/len;
+		avgY = points.reduce(function(a, b) { return a + b.y }, 0)/len;
+
+		return { x: avgX, y: avgY };
 	}
 
 	// function loadData(i) {
